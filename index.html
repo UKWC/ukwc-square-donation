@@ -53,7 +53,7 @@
 <div class="bar">Secure payment powered by Square</div>
 
 <main>
-<form id="donation-form">
+<form id="donation-form" novalidate>
   <section class="card">
     <div class="step">Step 1 — Choose Your Donation</div>
     <div class="amounts">
@@ -69,11 +69,11 @@
   <section class="card">
     <div class="step">Step 2 — Donor Information</div>
     <div class="row">
-      <div><label for="first-name">First Name</label><input id="first-name" required></div>
-      <div><label for="last-name">Last Name</label><input id="last-name" required></div>
+      <div><label for="first-name">First Name</label><input id="first-name" required minlength="2" maxlength="50"></div>
+      <div><label for="last-name">Last Name</label><input id="last-name" required minlength="2" maxlength="50"></div>
     </div>
-    <label for="email">Email</label><input id="email" type="email" required>
-    <label for="phone">Phone (Optional)</label><input id="phone" type="tel">
+    <label for="email">Email</label><input id="email" type="email" required maxlength="100">
+    <label for="phone">Phone (Optional)</label><input id="phone" type="tel" placeholder="(859) 555-1234" pattern="^(\\(\\d{3}\\)\\s?|\\d{3}[-.\\s]?)\\d{3}[-.\\s]?\\d{4}$">
     <div class="row">
       <div>
         <label for="dedication-type">Dedication (Optional)</label>
@@ -202,6 +202,20 @@ document.getElementById('donation-form').addEventListener('submit', async (event
     donateButton.disabled = false;
     updateAmountUI();
   }
+});
+
+
+const phone=document.getElementById('phone');
+phone.addEventListener('input',()=>{let d=phone.value.replace(/\D/g,'').slice(0,10);phone.value=d.length>6?`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`:d.length>3?`(${d.slice(0,3)}) ${d.slice(3)}`:d;});
+document.getElementById('donation-form').addEventListener('submit',e=>{
+const fn=firstName=document.getElementById('first-name');
+const ln=document.getElementById('last-name');
+const em=document.getElementById('email');
+fn.value=fn.value.trim();ln.value=ln.value.trim();em.value=em.value.trim();
+if(fn.value.length<2){alert('Please enter your first name.');fn.focus();e.preventDefault();return;}
+if(ln.value.length<2){alert('Please enter your last name.');ln.focus();e.preventDefault();return;}
+if(!em.checkValidity()){alert('Please enter a valid email address.');em.focus();e.preventDefault();return;}
+if(phone.value&&!phone.checkValidity()){alert('Please enter a valid phone number.');phone.focus();e.preventDefault();return;}
 });
 
 initializeSquare().catch(error => showStatus(error.message));
