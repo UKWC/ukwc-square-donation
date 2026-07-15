@@ -165,7 +165,9 @@ document.getElementById('donation-form').addEventListener('submit', async (event
         email: document.getElementById('email').value,
         phone: document.getElementById('phone').value,
         countryCode: 'US'
-      }
+      },
+      customerInitiated: true,
+      sellerKeyedIn: false
     });
 
     if (tokenResult.status !== 'OK') {
