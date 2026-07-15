@@ -1,0 +1,208 @@
+\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UKWC Scholarship Fund Donation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://web.squarecdn.com/v1/square.js"></script>
+  <style>
+    :root{
+      --navy:#1a1150; --purple:#5b3fa0; --mid:#7c5cbf;
+      --lav:#ede8f8; --lilac:#f5f1fc; --border:rgba(91,63,160,.20);
+      --shadow:0 10px 35px rgba(64,35,124,.12);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'DM Sans',sans-serif;color:#2d2250;background:var(--lilac)}
+    header{text-align:center;padding:42px 20px 30px;background:linear-gradient(#fff,var(--lav))}
+    h1,h2{font-family:'Playfair Display',serif;color:var(--navy)}
+    h1{font-size:clamp(2.2rem,7vw,3.5rem);margin:0}
+    header h2{font-style:italic;font-weight:400;color:var(--mid);margin:.4rem 0}
+    .bar{background:linear-gradient(90deg,var(--purple),var(--mid));color:#fff;text-align:center;padding:12px;font-weight:700}
+    main{max-width:650px;margin:auto;padding:28px 16px 60px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:22px;padding:24px;box-shadow:var(--shadow);margin-bottom:18px}
+    .step{font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:12px}
+    .amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .amount{border:2px solid var(--border);background:#fff;border-radius:15px;padding:17px 8px;text-align:center;font-size:1.3rem;font-weight:800;color:var(--navy);cursor:pointer}
+    .amount.selected{border-color:var(--purple);background:var(--lav);outline:3px solid rgba(124,92,191,.18)}
+    label{display:block;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--navy);margin:14px 0 6px}
+    input,select,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:13px;font:inherit;color:#2d2250;background:#fff}
+    input:focus,select:focus,textarea:focus{outline:3px solid rgba(124,92,191,.18);border-color:var(--purple)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    #card-container{min-height:90px;margin-top:12px}
+    button{width:100%;border:0;border-radius:14px;padding:15px;background:linear-gradient(135deg,var(--navy),var(--purple));color:#fff;font:700 1rem 'DM Sans';cursor:pointer;margin-top:14px}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .status{display:none;margin-top:14px;padding:12px;border-radius:12px;font-size:.9rem}
+    .status.error{display:block;background:#fde8e8;color:#8c1d18}
+    .status.success{display:block;background:#e8f7ee;color:#176b3a}
+    .fine{font-size:.78rem;color:#6d6090;line-height:1.5;margin-top:12px}
+    #thank-you{display:none;text-align:center;padding:50px 20px}
+    #thank-you .icon{font-size:3.6rem}
+    @media(max-width:550px){.amounts{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>UK Woman's Club</h1>
+  <h2>Scholarship Fund Donation</h2>
+  <p>Your generosity helps support deserving students.</p>
+</header>
+<div class="bar">Secure payment powered by Square</div>
+
+<main>
+<form id="donation-form">
+  <section class="card">
+    <div class="step">Step 1 — Choose Your Donation</div>
+    <div class="amounts">
+      <button type="button" class="amount" data-amount="25">$25</button>
+      <button type="button" class="amount selected" data-amount="50">$50</button>
+      <button type="button" class="amount" data-amount="100">$100</button>
+      <button type="button" class="amount" data-amount="250">$250</button>
+    </div>
+    <label for="amount">Other Amount</label>
+    <input id="amount" name="amount" type="number" min="1" step="0.01" value="50" required>
+  </section>
+
+  <section class="card">
+    <div class="step">Step 2 — Donor Information</div>
+    <div class="row">
+      <div><label for="first-name">First Name</label><input id="first-name" required></div>
+      <div><label for="last-name">Last Name</label><input id="last-name" required></div>
+    </div>
+    <label for="email">Email</label><input id="email" type="email" required>
+    <label for="phone">Phone (Optional)</label><input id="phone" type="tel">
+    <div class="row">
+      <div>
+        <label for="dedication-type">Dedication (Optional)</label>
+        <select id="dedication-type">
+          <option value="">None</option>
+          <option value="In Honor Of">In Honor Of</option>
+          <option value="In Memory Of">In Memory Of</option>
+        </select>
+      </div>
+      <div><label for="dedication-name">Name</label><input id="dedication-name"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step">Step 3 — Payment</div>
+    <div id="card-container"></div>
+    <button id="donate-button" type="submit">Donate $50.00</button>
+    <div id="status" class="status"></div>
+    <p class="fine">Your card details are entered directly into Square's secure payment fields and are not stored on this website.</p>
+  </section>
+</form>
+
+<section id="thank-you" class="card">
+  <div class="icon">💜</div>
+  <h2>Thank you for your donation!</h2>
+  <p>Your payment was successfully processed for the UK Woman's Club Scholarship Aid Fund.</p>
+</section>
+</main>
+
+<script>
+const APPLICATION_ID = 'sq0idp-j1ryN-bxpHiyJBxKHaAfAg';
+const LOCATION_ID = 'AW14764YKZHQG';
+let card;
+
+const amountInput = document.getElementById('amount');
+const donateButton = document.getElementById('donate-button');
+const statusBox = document.getElementById('status');
+
+function updateAmountUI() {
+  const amount = Number(amountInput.value || 0);
+  donateButton.textContent = amount > 0 ? `Donate $${amount.toFixed(2)}` : 'Donate';
+}
+document.querySelectorAll('.amount').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.amount').forEach(x => x.classList.remove('selected'));
+    btn.classList.add('selected');
+    amountInput.value = btn.dataset.amount;
+    updateAmountUI();
+  });
+});
+amountInput.addEventListener('input', () => {
+  document.querySelectorAll('.amount').forEach(x => x.classList.remove('selected'));
+  updateAmountUI();
+});
+
+async function initializeSquare() {
+  if (!window.Square) throw new Error('Square payment library did not load.');
+  const payments = window.Square.payments(APPLICATION_ID, LOCATION_ID);
+  card = await payments.card();
+  await card.attach('#card-container');
+}
+
+function showStatus(message, type='error') {
+  statusBox.textContent = message;
+  statusBox.className = `status ${type}`;
+}
+
+document.getElementById('donation-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  statusBox.className = 'status';
+
+  const amount = Number(amountInput.value);
+  if (!Number.isFinite(amount) || amount < 1) {
+    showStatus('Please enter a donation amount of at least $1.');
+    return;
+  }
+
+  donateButton.disabled = true;
+  donateButton.textContent = 'Processing…';
+
+  try {
+    const tokenResult = await card.tokenize({
+      amount: amount.toFixed(2),
+      currencyCode: 'USD',
+      intent: 'CHARGE',
+      billingContact: {
+        givenName: document.getElementById('first-name').value,
+        familyName: document.getElementById('last-name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        countryCode: 'US'
+      }
+    });
+
+    if (tokenResult.status !== 'OK') {
+      throw new Error(tokenResult.errors?.map(e => e.message).join(' ') || 'Card information could not be verified.');
+    }
+
+    const response = await fetch('/.netlify/functions/create-payment', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        sourceId: tokenResult.token,
+        amount,
+        donor: {
+          firstName: document.getElementById('first-name').value,
+          lastName: document.getElementById('last-name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          dedicationType: document.getElementById('dedication-type').value,
+          dedicationName: document.getElementById('dedication-name').value
+        }
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) throw new Error(result.message || 'Payment failed.');
+
+    document.getElementById('donation-form').style.display = 'none';
+    document.getElementById('thank-you').style.display = 'block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  } catch (error) {
+    showStatus(error.message || 'Something went wrong. Please try again.');
+    donateButton.disabled = false;
+    updateAmountUI();
+  }
+});
+
+initializeSquare().catch(error => showStatus(error.message));
+</script>
+</body>
+</html>
