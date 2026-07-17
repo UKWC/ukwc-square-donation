@@ -301,19 +301,6 @@
     }
     .btn-no-payment:hover { transform: translateY(-1px); box-shadow: var(--ukwc-shadow); }
 
-
-    #card-container {
-      min-height: 90px; margin-bottom: 1rem;
-    }
-    .btn-square {
-      width: 100%; padding: 0.9rem; border-radius: 14px; border: none;
-      background: #006aff; color: #fff; font-family: var(--font-sans);
-      font-size: 0.95rem; font-weight: 700; cursor: pointer;
-    }
-    .btn-square:disabled { opacity: 0.6; cursor: wait; }
-    .square-powered { text-align: center; font-size: 0.75rem; color: #9a8ab8; margin: 0.6rem 0 1rem; }
-    #paymentStatus { display:none; font-size:0.85rem; text-align:center; font-weight:700; margin:0.75rem 0; }
-
     @media (max-width: 500px) {
       .field-row { grid-template-columns: 1fr; }
       .info-card-cols { grid-template-columns: 1fr; }
@@ -488,14 +475,15 @@
       <p class="pay-amounts">Online payments include a small processing fee so the club receives the full entry amount:<br>
         <strong>18 Holes: $176.04 · 9 Holes: $124.34</strong>
       </p>
-      <div id="card-container"></div>
-      <button type="button" id="squarePayButton" class="btn-square">Pay with Square &amp; Submit Registration</button>
-      <p class="square-powered">Secure payment powered by Square</p>
-      <p id="paymentStatus"></p>
+      <div id="card-container" style="margin-bottom:0.75rem;"></div>
+      <button type="button" id="squarePayButton" class="btn-paypal btn-card">💳 Pay with Square</button>
+      <p class="paypal-powered">Powered by Square</p>
+      <p id="paymentStatus" style="display:none; font-size:0.85rem; text-align:center; font-weight:700; margin-bottom:0.75rem;"></p>
+      <input type="checkbox" name="paypal_paid" id="paypalPaidCheck" value="Yes - Square payment completed" style="display:none;" />
       <p class="pay-mail-note">Prefer to pay by check? Make payable to <strong>UKWC</strong> and mail to:<br>
         Chris Futsch · 370 Glasford Square, #110 · Lexington, KY 40513</p>
       <p id="genderError" style="display:none; color:#c0392b; font-size:0.85rem; text-align:center; font-weight:700; margin-bottom:0.75rem;">⚠ Teams must be either two women, or one woman and one man. Please adjust your selections above.</p>
-      <button type="submit" class="btn-no-payment">Submit Registration Without Online Payment</button>
+      <button type="submit" class="btn-no-payment">Submit Registration</button>
     </div>
     </form>
 
@@ -515,14 +503,7 @@
   <script>
     const SQUARE_APP_ID = 'sq0idp-j1ryN-bxpHiyJBxKHaAfAg';
     const SQUARE_LOCATION_ID = 'AW14764YKZHQG';
-    const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxTFBvvrHWeTQr8rIEAXJYJAoJhgqz_T9PAXjdOpmk3OcNRe9oMUoQK9v2mPECGHmLiAQ/exec';
     let squareCard;
-
-    function selectFee(card) {
-      document.querySelectorAll('.fee-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      card.querySelector('input[type="radio"]').checked = true;
-    }
 
     async function initializeSquare() {
       const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
@@ -530,21 +511,84 @@
       await squareCard.attach('#card-container');
     }
 
-    function validateTeam() {
+    function selectFee(card) {
+      document.querySelectorAll('.fee-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      const radio = card.querySelector('input[type="radio"]');
+      radio.checked = true;
+    }
+
+    const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxTFBvvrHWeTQr8rIEAXJYJAoJhgqz_T9PAXjdOpmk3OcNRe9oMUoQK9v2mPECGHmLiAQ/exec';
+
+    document.getElementById('squarePayButton').addEventListener('click', async function() {
+      const form = document.getElementById('scrambleForm');
+      if (!form.reportValidity()) return;
+
       const p1 = document.querySelector('input[name="player1_gender"]:checked');
       const p2 = document.querySelector('input[name="player2_gender"]:checked');
       const errorEl = document.getElementById('genderError');
       if (p1 && p2 && p1.value === 'Male' && p2.value === 'Male') {
         errorEl.style.display = 'block';
         errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return false;
+        return;
       }
       errorEl.style.display = 'none';
-      return true;
-    }
 
-    function buildData(paymentStatus) {
-      return {
+      const button = this;
+      const status = document.getElementById('paymentStatus');
+      button.disabled = true;
+      status.style.display = 'block';
+      status.style.color = '#5b3fa0';
+      status.textContent = 'Processing payment…';
+
+      try {
+        const tokenResult = await squareCard.tokenize();
+        if (tokenResult.status !== 'OK') throw new Error('Card information could not be verified.');
+        const fee = document.querySelector('input[name="fee"]:checked').value;
+        const response = await fetch('/.netlify/functions/create-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sourceId: tokenResult.token, fee: fee })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || 'Payment was not completed.');
+        document.getElementById('paypalPaidCheck').checked = true;
+        status.style.color = '#2e7d32';
+        status.textContent = 'Payment complete. Click Submit Registration below.';
+        button.textContent = 'Payment Complete';
+      } catch (error) {
+        status.style.color = '#c0392b';
+        status.textContent = error.message || 'Payment was not completed. Please try again.';
+        button.disabled = false;
+      }
+    });
+
+    initializeSquare().catch(function() {
+      const status = document.getElementById('paymentStatus');
+      status.style.display = 'block';
+      status.style.color = '#c0392b';
+      status.textContent = 'Square payment could not load. Please refresh the page.';
+      document.getElementById('squarePayButton').disabled = true;
+    });
+
+    document.getElementById('scrambleForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const p1 = document.querySelector('input[name="player1_gender"]:checked');
+      const p2 = document.querySelector('input[name="player2_gender"]:checked');
+      const errorEl = document.getElementById('genderError');
+
+      if (p1 && p2 && p1.value === 'Male' && p2.value === 'Male') {
+        errorEl.style.display = 'block';
+        errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      errorEl.style.display = 'none';
+
+      const form = document.getElementById('scrambleForm');
+      const formData = new FormData(form);
+
+      const data = {
         fee:             (document.querySelector('input[name="fee"]:checked') || {}).value || '',
         player1_gender:  (document.querySelector('input[name="player1_gender"]:checked') || {}).value || '',
         player1_ghin:    document.querySelector('input[name="player1_ghin"]').value || '',
@@ -564,74 +608,27 @@
         player2_zip:     document.querySelector('input[name="player2_zip"]').value || '',
         player2_phone:   document.querySelector('input[name="player2_phone"]').value || '',
         player2_email:   document.querySelector('input[name="player2_email"]').value || '',
-        paypal_paid:     paymentStatus
+        paypal_paid:     document.getElementById('paypalPaidCheck').checked ? 'Yes - Square payment completed' : 'No payment indicated'
       };
-    }
 
-    async function submitRegistration(paymentStatus) {
-      const form = document.getElementById('scrambleForm');
-      const formData = new FormData(form);
-      formData.set('paypal_paid', paymentStatus);
-      const data = buildData(paymentStatus);
-
+      // Send to Formspree
       fetch('https://formspree.io/f/xkoklryj', {
-        method: 'POST', body: formData, headers: { 'Accept': 'application/json' }
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
       }).catch(function() {});
 
+      // Send to Google Sheets
       fetch(SHEETS_URL, {
-        method: 'POST', body: JSON.stringify(data)
+        method: 'POST',
+        body: JSON.stringify(data)
       }).catch(function() {});
 
+      // Show thank-you, hide form
       form.style.display = 'none';
       const thankYou = document.getElementById('thankYou');
       thankYou.style.display = 'block';
       thankYou.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    document.getElementById('squarePayButton').addEventListener('click', async function() {
-      const form = document.getElementById('scrambleForm');
-      if (!form.reportValidity() || !validateTeam()) return;
-
-      const button = this;
-      const status = document.getElementById('paymentStatus');
-      button.disabled = true;
-      status.style.display = 'block';
-      status.style.color = '#5b3fa0';
-      status.textContent = 'Processing payment…';
-
-      try {
-        const tokenResult = await squareCard.tokenize();
-        if (tokenResult.status !== 'OK') throw new Error('Card information could not be verified.');
-
-        const fee = document.querySelector('input[name="fee"]:checked').value;
-        const response = await fetch('/.netlify/functions/create-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sourceId: tokenResult.token, fee: fee })
-        });
-        const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.error || 'Payment was not completed.');
-
-        await submitRegistration('Yes - Square payment completed');
-      } catch (error) {
-        status.style.color = '#c0392b';
-        status.textContent = error.message || 'Payment was not completed. Please try again.';
-        button.disabled = false;
-      }
-    });
-
-    document.getElementById('scrambleForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      if (!this.reportValidity() || !validateTeam()) return;
-      submitRegistration('No payment indicated');
-    });
-
-    initializeSquare().catch(function() {
-      const status = document.getElementById('paymentStatus');
-      status.style.display = 'block';
-      status.style.color = '#c0392b';
-      status.textContent = 'Square payment could not load. Please refresh the page.';
-      document.getElementById('squarePayButton').disabled = true;
     });
   </script>
 
