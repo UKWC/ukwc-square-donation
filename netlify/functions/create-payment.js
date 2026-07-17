@@ -1,9 +1,8 @@
-\
 const crypto = require('crypto');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ success:false, message:'Method not allowed' }) };
+    return { statusCode: 405, body: JSON.stringify({ success: false, message: 'Method not allowed' }) };
   }
 
   try {
@@ -11,7 +10,7 @@ exports.handler = async (event) => {
     const numericAmount = Number(amount);
 
     if (!sourceId || !Number.isFinite(numericAmount) || numericAmount < 1) {
-      return { statusCode: 400, body: JSON.stringify({ success:false, message:'Invalid payment request.' }) };
+      return { statusCode: 400, body: JSON.stringify({ success: false, message: 'Invalid payment request.' }) };
     }
 
     const accessToken = process.env.SQUARE_ACCESS_TOKEN;
@@ -50,7 +49,7 @@ exports.handler = async (event) => {
 
     if (!squareResponse.ok) {
       const message = squareData.errors?.map(e => e.detail || e.code).join(' ') || 'Square declined the payment.';
-      return { statusCode: squareResponse.status, body: JSON.stringify({ success:false, message }) };
+      return { statusCode: squareResponse.status, body: JSON.stringify({ success: false, message }) };
     }
 
     return {
@@ -64,7 +63,7 @@ exports.handler = async (event) => {
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ success:false, message:error.message || 'Unable to process payment.' })
+      body: JSON.stringify({ success: false, message: error.message || 'Unable to process payment.' })
     };
   }
 };
