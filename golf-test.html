@@ -249,14 +249,14 @@
     .gender-row input[type="checkbox"] { width: 16px; height: 16px; min-height: unset; accent-color: var(--ukwc-purple); border-radius: 4px !important; }
     .ghin-input { flex: 1; min-width: 120px; }
 
-    input[type="text"], input[type="email"], input[type="tel"] {
+    input[type="text"], input[type="email"], input[type="tel"], select {
       width: 100%; padding: 0.6rem 0.9rem;
       border: 1px solid var(--ukwc-border) !important;
       border-radius: 14px !important; background: #fff !important;
       color: #2d2250 !important; font-family: var(--font-sans);
       font-size: 0.9rem; min-height: 44px; outline: none;
     }
-    input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
+    input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, select:focus {
       border-color: var(--ukwc-purple) !important;
       outline: 3px solid rgba(155,107,232,0.22) !important;
     }
@@ -412,9 +412,9 @@
             <div class="ghin-input"><input type="text" name="player1_ghin" placeholder="GHIN number" /></div>
           </div>
         </div>
-        <div class="field-group">
-          <label class="field-label">Full Name *</label>
-          <input type="text" name="player1_name" placeholder="First Last" required />
+        <div class="field-row">
+          <div><label class="field-label">First Name *</label><input type="text" name="player1_first_name" placeholder="First" required /></div>
+          <div><label class="field-label">Last Name *</label><input type="text" name="player1_last_name" placeholder="Last" required /></div>
         </div>
         <div class="field-group">
           <label class="field-label">Address *</label>
@@ -422,7 +422,12 @@
         </div>
         <div class="field-row">
           <div><label class="field-label">City *</label><input type="text" name="player1_city" placeholder="City" required /></div>
-          <div><label class="field-label">State *</label><input type="text" name="player1_state" placeholder="KY" required /></div>
+          <div><label class="field-label">State *</label>
+            <select name="player1_state" required>
+              <option value="">-- Select --</option>
+              <option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option><option>CO</option><option>CT</option><option>DE</option><option>DC</option><option>FL</option><option>GA</option><option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option><option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option><option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option><option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option><option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option><option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option><option>SD</option><option>TN</option><option>TX</option><option>UT</option><option>VT</option><option>VA</option><option>WA</option><option>WV</option><option>WI</option><option>WY</option>
+            </select>
+          </div>
           <div><label class="field-label">Zip Code *</label><input type="text" name="player1_zip" placeholder="40502" required /></div>
         </div>
         <div class="field-row">
@@ -447,9 +452,9 @@
             <div class="ghin-input"><input type="text" name="player2_ghin" placeholder="GHIN number" /></div>
           </div>
         </div>
-        <div class="field-group">
-          <label class="field-label">Full Name *</label>
-          <input type="text" name="player2_name" placeholder="First Last" required />
+        <div class="field-row">
+          <div><label class="field-label">First Name *</label><input type="text" name="player2_first_name" placeholder="First" required /></div>
+          <div><label class="field-label">Last Name *</label><input type="text" name="player2_last_name" placeholder="Last" required /></div>
         </div>
         <div class="field-group">
           <label class="field-label">Address *</label>
@@ -457,7 +462,12 @@
         </div>
         <div class="field-row">
           <div><label class="field-label">City *</label><input type="text" name="player2_city" placeholder="City" required /></div>
-          <div><label class="field-label">State *</label><input type="text" name="player2_state" placeholder="KY" required /></div>
+          <div><label class="field-label">State *</label>
+            <select name="player2_state" required>
+              <option value="">-- Select --</option>
+              <option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option><option>CO</option><option>CT</option><option>DE</option><option>DC</option><option>FL</option><option>GA</option><option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option><option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option><option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option><option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option><option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option><option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option><option>SD</option><option>TN</option><option>TX</option><option>UT</option><option>VT</option><option>VA</option><option>WA</option><option>WV</option><option>WI</option><option>WY</option>
+            </select>
+          </div>
           <div><label class="field-label">Zip Code *</label><input type="text" name="player2_zip" placeholder="40502" required /></div>
         </div>
         <div class="field-row">
@@ -518,7 +528,7 @@
       radio.checked = true;
     }
 
-    const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxTFBvvrHWeTQr8rIEAXJYJAoJhgqz_T9PAXjdOpmk3OcNRe9oMUoQK9v2mPECGHmLiAQ/exec';
+    const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby4KXSvxvy3DUj6VmKoGACn6ffWJmHTBl3oSbRpkXKMc6zpkDC-3dNfcT3FCXo9HGtQ6Q/exec';
 
     document.getElementById('squarePayButton').addEventListener('click', async function() {
       const form = document.getElementById('scrambleForm');
@@ -592,7 +602,8 @@
         fee:             (document.querySelector('input[name="fee"]:checked') || {}).value || '',
         player1_gender:  (document.querySelector('input[name="player1_gender"]:checked') || {}).value || '',
         player1_ghin:    document.querySelector('input[name="player1_ghin"]').value || '',
-        player1_name:    document.querySelector('input[name="player1_name"]').value || '',
+        player1_first_name: document.querySelector('input[name="player1_first_name"]').value || '',
+        player1_last_name:  document.querySelector('input[name="player1_last_name"]').value || '',
         player1_address: document.querySelector('input[name="player1_address"]').value || '',
         player1_city:    document.querySelector('input[name="player1_city"]').value || '',
         player1_state:   document.querySelector('input[name="player1_state"]').value || '',
@@ -601,7 +612,8 @@
         player1_email:   document.querySelector('input[name="player1_email"]').value || '',
         player2_gender:  (document.querySelector('input[name="player2_gender"]:checked') || {}).value || '',
         player2_ghin:    document.querySelector('input[name="player2_ghin"]').value || '',
-        player2_name:    document.querySelector('input[name="player2_name"]').value || '',
+        player2_first_name: document.querySelector('input[name="player2_first_name"]').value || '',
+        player2_last_name:  document.querySelector('input[name="player2_last_name"]').value || '',
         player2_address: document.querySelector('input[name="player2_address"]').value || '',
         player2_city:    document.querySelector('input[name="player2_city"]').value || '',
         player2_state:   document.querySelector('input[name="player2_state"]').value || '',
