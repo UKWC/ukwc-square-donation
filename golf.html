@@ -501,8 +501,8 @@
     </div>
 
   <script>
-    const SQUARE_APP_ID = 'sq0idp-j1ryN-bxpHiyJBxKHaAfAg';
-    const SQUARE_LOCATION_ID = 'AW14764YKZHQG';
+    const SQUARE_APP_ID = window.SQUARE_APP_ID || 'sq0idp-j1ryN-bxpHiyJBxKHaAfAg';
+    const SQUARE_LOCATION_ID = window.SQUARE_LOCATION_ID || 'AW14764YKZHQG';
     let squareCard;
 
     async function initializeSquare() {
